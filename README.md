@@ -7,7 +7,7 @@ One component of my vision of FULLY AUTOMATED competative debate case production
 
 
 1. We need a way to quickly create word embedding powered document classifiers which learn with a human in the loop. For some classes, an extremely limited number of examples may be all that is necessary to get results that a user would consider to be succesful for their task. 
-2. I want to know what my model is learning - so I integrate the word embeddings avalible with Flair, combine with Classifiers in Sklearn and PyTorch, and finish it off with the LIME algorithim for model interpretability (implemented within the ELI5 Library)
+2. I want to know what my model is learning - so I integrate the word embeddings avalible with [Flair](https://github.com/zalandoresearch/flair), combine with Classifiers in Sklearn and PyTorch, and finish it off with the [LIME](https://arxiv.org/pdf/1602.04938.pdf) algorithim for model interpretability (implemented within the [ELI5](https://eli5.readthedocs.io/en/latest/index.html) Library)
 
 
 
