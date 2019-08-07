@@ -25,6 +25,10 @@ Toy example of a possible debate classifier seperating between 11 classes
 
 ANB = Antiblackness, CAP = Capitalism, ECON = Economy, EDU = Education, ENV = Environment, EX = Extinction, FED = Federalism, HEG = Hegemony, NAT = Natives, POL = Politics, TOP = Topicality
 
+Top matrix is a confusion matrix of my validation set 
+
+Bottom matrix is showing classification probabilities for each individual example in my validation set.
+
 ![](https://github.com/Hellisotherpeople/Active-Explainable-Classification/blob/master/conf_matrix.png)
 
 Takes in documents from the user using Standard Input - Then the model classifies, explains why it classified the way it did, and asks the user if the predicted label is the ground truth or not. User supplies the ground truth, the model incrementally trains on the new example, and the cycle continues. This is called *active learning* 
