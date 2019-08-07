@@ -31,6 +31,6 @@ Bottom matrix is showing classification probabilities for each individual exampl
 
 ![](https://github.com/Hellisotherpeople/Active-Explainable-Classification/blob/master/conf_matrix.png)
 
-Takes in documents from the user using Standard Input - Then the model classifies, explains why it classified the way it did, and asks the user if the predicted label is the ground truth or not. User supplies the ground truth, the model incrementally trains on the new example, and the cycle continues. This is called *active learning* 
+Takes in documents from the user using Standard Input - Then the model classifies, explains why it classified the way it did, and asks the user if the predicted label is the ground truth or not. User supplies the ground truth, the model incrementally trains on the new example, and that new example (with human supplied label) is appended to my dataset and the cycle continues. This is called *active learning* 
 
 ![](https://github.com/Hellisotherpeople/Active-Explainable-Classification/blob/master/explaination.png)
