@@ -14,10 +14,15 @@ One component of my vision of FULLY AUTOMATED competative debate case production
 
 
 
-TODO: 1. Finish README - Cite relavent technologies and papers 
+TODO:
+1. Finish README - Cite relavent technologies and papers 
 2. Documentation/Examples/Installation Instructions 
 3. More examples
 
+Changelog: 
+8/8/2019 - 
+* Added Keras model support - now utilizes by default KNN if not in Keras mode and a Neural Network if in Keras mode. 
+* Added HTML exporting of model explanations. 
 
 ## Examples 
 
@@ -29,6 +34,8 @@ Toy example of a possible debate classifier seperating between 11 classes
 ANB = Antiblackness, CAP = Capitalism, ECON = Economy, EDU = Education, ENV = Environment, EX = Extinction, FED = Federalism, HEG = Hegemony, NAT = Natives, POL = Politics, TOP = Topicality
 
 Top matrix is a confusion matrix of my validation set 
+
+This classifier gets 75% accuracy
 
 Bottom matrix is showing classification probabilities for each individual example in my validation set.
 
