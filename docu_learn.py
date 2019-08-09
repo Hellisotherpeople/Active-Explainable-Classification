@@ -29,20 +29,34 @@ from sklearn.base import TransformerMixin, BaseEstimator
 import eli5 
 from eli5.lime import TextExplainer
 from eli5 import explain_prediction
-from eli5.formatters import format_as_text
+from eli5.formatters import format_as_text, format_as_html
 import pandas as pd
+from IPython.display import display
+from keras.callbacks import ModelCheckpoint
+from keras.wrappers.scikit_learn import KerasClassifier
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.models import load_model
 
-
+keras = False
 increment = False
 
 stacked_embeddings = DocumentPoolEmbeddings([
                                         WordEmbeddings('en'),
                                         WordEmbeddings('glove'),
-                                        #WordEmbeddings('extvec'),#ELMoEmbeddings('original'),
+                                        WordEmbeddings('extvec'),#ELMoEmbeddings('original'),
                                         #BertEmbeddings('bert-base-cased'),
                                         #FlairEmbeddings('news-forward-fast'),
                                         #FlairEmbeddings('news-backward-fast'),
                                         ]) #, mode='max')
+
+def create_model(optimizer='adam', kernel_initializer='glorot_uniform', epochs = 5):
+        model = Sequential()
+        model.add(Dense(list_of_embeddings[1].size, activation='relu',kernel_initializer='he_uniform', use_bias = True))
+        model.add(Dense(11,activation='softmax',kernel_initializer=kernel_initializer, use_bias = True))
+        model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
+        return model
+
 
 def parse_string(a_str):
     to_ret = "".join([c.lower() for c in a_str if c in string.ascii_letters or c in string.whitespace])
@@ -69,7 +83,7 @@ class Text2Vec( BaseEstimator, TransformerMixin):
                 else:
                     a_set = Sentence(p_str)
                     stacked_embeddings.embed(a_set)
-                    list_of_emb.append(a_set.get_embedding().detach().numpy())
+                    list_of_emb.append(a_set.get_embedding().cpu().detach().numpy())
             to_ret = np.array(list_of_emb)
         else:
             try:
@@ -79,7 +93,7 @@ class Text2Vec( BaseEstimator, TransformerMixin):
                 else:
                     a_set = Sentence(p_str)
                     stacked_embeddings.embed(a_set)
-                    to_ret = a_set.get_embedding().detach().numpy().reshape(1, -1)
+                    to_ret = a_set.get_embedding().cpu().detach().numpy().reshape(1, -1)
             except:
                 print(type(X))
                 print(X)
@@ -89,18 +103,23 @@ class Text2Vec( BaseEstimator, TransformerMixin):
 
 pipe = joblib.load('saved_card_classification.pkl')
 
-te = TextExplainer(random_state=42, n_samples=1000, position_dependent=True)
+if keras:
+    pipe.named_steps['model'].model = load_model('keras_model.h5')
+
+
+te = TextExplainer(random_state=42, n_samples=10000, position_dependent=True)
 
 def explain_pred(sentence):
     te.fit(sentence, pipe.predict_proba)
     #txt = format_as_text(te.explain_prediction(target_names=["green", "neutral", "red"]))
-    txt = format_as_text(te.explain_prediction(top = 20, target_names=["ANB", "CAP", "ECON", "EDU", "ENV", "EX", "FED", "HEG", "NAT", "POL", "TOP"]))
-    print(txt)
+    t_pred = te.explain_prediction(top = 20, target_names=["ANB", "CAP", "ECON", "EDU", "ENV", "EX", "FED", "HEG", "NAT", "POL", "TOP"])
+    txt = format_as_text(t_pred)
+    html = format_as_html(t_pred)
+    html_file = open("latest_prediction.html", "a+")
+    html_file.write(html)
+    html_file.close()
     print(te.metrics_)
 
-def direct_explain_pred(sentence):
-    txt = format_as_text(eli5.explain_prediction(model, doc=sentence, target_names=["green", "neutral", "red"], vec=Text2Vec())) #get vector importances
-    print(txt)
 
 def print_misclass():
     print("misclassified examples!!!")
@@ -124,6 +143,9 @@ with open('card_classification.csv', 'a') as csvfile:
             break
         elif label == "stop":
             csvfile.close()
+            if keras:
+                pipe.named_steps['model'].model.save('keras_model.h5')
+                pipe.named_steps['model'].model = None
             joblib.dump(pipe, 'saved_card_classification.pkl')
             print("Model Dumped!!!!")
             done = True
@@ -134,7 +156,7 @@ with open('card_classification.csv', 'a') as csvfile:
                 t_model = pipe.named_steps['model']
                 ppset = Sentence(str(to_process))
                 stacked_embeddings.embed(ppset)
-                the_emb = ppset.get_embedding().detach().numpy().reshape(1, -1)
+                the_emb = ppset.get_embedding().cpu().detach().numpy().reshape(1, -1)
                 t_model.partial_fit(the_emb, the_labels) ##INCREMENTAL LEARNING MODE ENGAGED
             the_labels.append(str(to_process))
             spamwriter.writerow(the_labels)

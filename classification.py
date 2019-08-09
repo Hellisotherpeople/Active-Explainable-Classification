@@ -27,7 +27,13 @@ from eli5 import explain_prediction
 from eli5.formatters import format_as_text
 import pandas as pd
 from sklearn.externals import joblib
+from keras.callbacks import ModelCheckpoint
+from keras.wrappers.scikit_learn import KerasClassifier
+from keras.models import Sequential
+from keras.layers import Dense
 
+
+keras = False
 
 def parse_string(a_str):
     to_ret = "".join([c.lower() for c in a_str if c in string.ascii_letters or c in string.whitespace])
@@ -54,7 +60,7 @@ class Text2Vec( BaseEstimator, TransformerMixin):
                 else:
                     a_set = Sentence(p_str)
                     stacked_embeddings.embed(a_set)
-                    list_of_emb.append(a_set.get_embedding().detach().numpy())
+                    list_of_emb.append(a_set.get_embedding().cpu().detach().numpy())
             to_ret = np.array(list_of_emb)
         else:
             try:
@@ -64,7 +70,7 @@ class Text2Vec( BaseEstimator, TransformerMixin):
                 else:
                     a_set = Sentence(p_str)
                     stacked_embeddings.embed(a_set)
-                    to_ret = a_set.get_embedding().detach().numpy().reshape(1, -1)
+                    to_ret = a_set.get_embedding().cpu().detach().numpy().reshape(1, -1)
             except:
                 print(type(X))
                 print(X)
@@ -73,7 +79,7 @@ class Text2Vec( BaseEstimator, TransformerMixin):
 
 
 stacked_embeddings = DocumentPoolEmbeddings([WordEmbeddings('en'),
-                                        WordEmbeddings('glove'),])
+                                        WordEmbeddings('glove'), WordEmbeddings('extvec')])
 
 with open('card_classification.csv') as csvfile:
     reader = csv.reader(csvfile)
@@ -86,17 +92,36 @@ with open('card_classification.csv') as csvfile:
         list_of_sentences.append(parsed_string)
         set_obj = Sentence(parsed_string)
         stacked_embeddings.embed(set_obj)
-        list_of_embeddings.append(set_obj.get_embedding().detach().numpy())
+        list_of_embeddings.append(set_obj.get_embedding().cpu().detach().numpy())
 
 
 X_train, X_val, Y_train, Y_val, Emb_train, Emb_val = train_test_split(list_of_sentences, list_of_labels, list_of_embeddings, test_size = 0.30, stratify = list_of_labels, random_state=42)
 
 
+
+def create_model(optimizer='adam', kernel_initializer='glorot_uniform', epochs = 5):
+        model = Sequential()
+        model.add(Dense(list_of_embeddings[1].size, activation='relu',kernel_initializer='he_uniform', use_bias = False))
+        model.add(Dense(11,activation='softmax',kernel_initializer=kernel_initializer, use_bias = False))
+        model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
+        return model
+
+
+
+if keras:
+    checkpointer = ModelCheckpoint(filepath='/tmp/weights.hdf5', verbose=1, save_best_only=True)    
+    model = KerasClassifier(build_fn=create_model, batch_size = 32, epochs = 100, callbacks=[checkpointer], validation_split = 0.2)
+
 #model = SVC(kernel = "rbf", probability = True)
-#model = KNeighborsClassifier(n_neighbors=5, metric='cosine', weights = 'distance')
+model = KNeighborsClassifier(n_neighbors=5, metric='cosine', weights = 'distance')
 #model  = AdaBoostClassifier(n_estimators = 100, random_state = 42)
 #model = RandomForestClassifier(n_jobs = -1, n_estimators = 100, max_features = "auto", criterion = "entropy")
-model = MLPClassifier(hidden_layer_sizes=(500,), activation = 'relu', solver = 'adam', verbose = True, max_iter = 100) #early_stopping = True, validation_fraction = 0.3, n_iter_no_change = 100)
+#model = MLPClassifier(hidden_layer_sizes=(500,), activation = 'relu', solver = 'adam', verbose = True, max_iter = 100) #early_stopping = True, validation_fraction = 0.3, n_iter_no_change = 100)
+
+
+
+
+
 pipe = Pipeline([('text2vec', Text2Vec()), ('model', model)])
 #model.fit(Emb_train, Y_train)
 pipe.fit(X_train, Y_train)
@@ -115,5 +140,8 @@ a_df = pd.DataFrame(probs, index=Y_val, columns=labels)
 a_df[a_df.eq(0)] = np.nan
 print(a_df)
 
+if keras:
+    pipe.named_steps['model'].model.save('keras_model.h5')
+    pipe.named_steps['model'].model = None
 joblib.dump(pipe, 'saved_card_classification.pkl')
 print("Model Dumped!!!!")
