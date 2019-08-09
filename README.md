@@ -21,6 +21,7 @@ TODO:
 * Figure out better way to store embeddings (stop moving the embeddings from GPU to CPU ineffeciently)
 
 Changelog: 
+
 8/8/2019 - 
 * Added Keras model support - now utilizes by default KNN if not in Keras mode and a Neural Network if in Keras mode. 
 * Added HTML exporting of model explanations. - Thank you ELI5!
