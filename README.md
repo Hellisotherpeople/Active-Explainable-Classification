@@ -22,6 +22,13 @@ TODO:
 
 Changelog: 
 
+
+8/9/2019 - 
+* Added model, model weights, updated dataset, and misc code updates 
+* Tried to get Keras LSTM/CNN to work (failed) 
+* Experimented with different settings on LIME.
+
+
 8/8/2019 - 
 * Added Keras model support - now utilizes by default KNN if not in Keras mode and a Neural Network if in Keras mode. 
 * Added HTML exporting of model explanations. - Thank you ELI5!
