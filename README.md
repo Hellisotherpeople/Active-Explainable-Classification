@@ -11,7 +11,7 @@ I want to take in massive sums of articles from a news API which will be placed 
 
 1. We need a way to quickly create word embedding powered document classifiers which learn with a human in the loop. For some classes, an extremely limited number of examples may be all that is necessary to get results that a user would consider to be succesful for their task. 
 
-2. I want to know what my model is learning - so I integrate the word embeddings avalible with [Flair](https://github.com/zalandoresearch/flair), combine with Classifiers in Sklearn and PyTorch, and finish it off with the [LIME](https://arxiv.org/pdf/1602.04938.pdf) algorithim for model interpretability (implemented within the [ELI5](https://eli5.readthedocs.io/en/latest/index.html) Library)
+2. I want to know what my model is learning - so I integrate the word embeddings avalible with [Flair](https://github.com/zalandoresearch/flair), combine with Classifiers in Sklearn and Tensorflow/Keras/PyTorch, and finish it off with a nice squeeze of the [LIME](https://arxiv.org/pdf/1602.04938.pdf) algorithim for model interpretability (implemented within the [ELI5](https://eli5.readthedocs.io/en/latest/index.html) Library)
 
 
 TODO:
@@ -23,7 +23,7 @@ TODO:
 Changelog: 
 8/8/2019 - 
 * Added Keras model support - now utilizes by default KNN if not in Keras mode and a Neural Network if in Keras mode. 
-* Added HTML exporting of model explanations. 
+* Added HTML exporting of model explanations. - Thank you ELI5!
 * Tested the possibility of doing Multilabel classification with TextExplainer... doesn't seem to work :( 
 * Added pictures
 
