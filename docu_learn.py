@@ -38,13 +38,13 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.models import load_model
 
-keras = False
+keras = True
 increment = False
 
 stacked_embeddings = DocumentPoolEmbeddings([
-                                        WordEmbeddings('en'),
-                                        WordEmbeddings('glove'),
-                                        WordEmbeddings('extvec'),#ELMoEmbeddings('original'),
+                                        #WordEmbeddings('en'),
+                                        #WordEmbeddings('glove'),
+                                        WordEmbeddings('en-crawl'),#ELMoEmbeddings('original'),
                                         #BertEmbeddings('bert-base-cased'),
                                         #FlairEmbeddings('news-forward-fast'),
                                         #FlairEmbeddings('news-backward-fast'),
@@ -107,12 +107,12 @@ if keras:
     pipe.named_steps['model'].model = load_model('keras_model.h5')
 
 
-te = TextExplainer(random_state=42, n_samples=10000, position_dependent=True)
+te = TextExplainer(random_state=42, n_samples=3000, position_dependent=False)
 
 def explain_pred(sentence):
     te.fit(sentence, pipe.predict_proba)
     #txt = format_as_text(te.explain_prediction(target_names=["green", "neutral", "red"]))
-    t_pred = te.explain_prediction(top = 20, target_names=["ANB", "CAP", "ECON", "EDU", "ENV", "EX", "FED", "HEG", "NAT", "POL", "TOP"])
+    t_pred = te.explain_prediction(top = 20, target_names=["ANB", "CAP", "ECON", "EDU", "ENV", "EX", "FED", "HEG", "NAT", "POL", "TOP", "ORI", "QER","COL",])
     txt = format_as_text(t_pred)
     html = format_as_html(t_pred)
     html_file = open("latest_prediction.html", "a+")
@@ -143,11 +143,11 @@ with open('card_classification.csv', 'a') as csvfile:
             break
         elif label == "stop":
             csvfile.close()
-            if keras:
+            if keras and increment:
                 pipe.named_steps['model'].model.save('keras_model.h5')
                 pipe.named_steps['model'].model = None
-            joblib.dump(pipe, 'saved_card_classification.pkl')
-            print("Model Dumped!!!!")
+                joblib.dump(pipe, 'saved_card_classification.pkl')
+                print("Model Dumped!!!!")
             done = True
             sys.exit()
         else:
