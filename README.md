@@ -15,6 +15,7 @@ I want to take in massive sums of articles from a news API which will be placed 
 
 
 TODO:
+* Enable Keras CNN/LSTMs (HELP ME!) 
 * Finish README - Cite relavent technologies and papers 
 * Documentation/Examples/Installation Instructions 
 * More examples
