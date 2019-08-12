@@ -15,14 +15,14 @@ I want to take in massive sums of articles from a news API which will be placed 
 
 
 TODO:
-* Enable Keras CNN/LSTMs (HELP ME!) 
 * Finish README - Cite relavent technologies and papers 
 * Documentation/Examples/Installation Instructions 
 * More examples
 * Figure out better way to store embeddings (stop moving the embeddings from GPU to CPU ineffeciently)
 
 Changelog: 
-
+8/12/2019 - 
+* got Keras RNN/CNN working!
 
 8/9/2019 - 
 * Added model, model weights, updated dataset, and misc code updates 
