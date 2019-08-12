@@ -21,6 +21,7 @@ TODO:
 * Figure out better way to store embeddings (stop moving the embeddings from GPU to CPU ineffeciently)
 
 Changelog: 
+
 8/12/2019 - 
 * got Keras RNN/CNN working!
 
