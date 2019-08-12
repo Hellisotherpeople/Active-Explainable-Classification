@@ -30,7 +30,7 @@ from sklearn.externals import joblib
 from keras.callbacks import ModelCheckpoint
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, Embedding, Reshape, Input, SimpleRNN, LSTM
+from keras.layers import Dense, Conv1D, Conv2D, MaxPooling1D, Flatten, Embedding, Reshape, Input, SimpleRNN, LSTM, InputLayer, GRU
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -103,13 +103,19 @@ with open('card_classification.csv') as csvfile:
 
 X_train, X_val, Y_train, Y_val, Emb_train, Emb_val = train_test_split(np.asarray(list_of_sentences), np.asarray(list_of_labels), np.asarray(list_of_embeddings), test_size = 0.30, stratify = list_of_labels, random_state=42)
 
-print(list_of_embeddings[1].size)
+print(Emb_train.shape[1:])
 
 def create_model(optimizer='adam', kernel_initializer='glorot_uniform', epochs = 5):
         model = Sequential()
-        #model.add(Reshape((137, 1, 400), input_shape = (137, 400)))
-        #model.add(Conv1D(64, 1, activation='relu'))
-        model.add(Dense(list_of_embeddings[1].size, activation='relu',kernel_initializer='he_uniform', use_bias = False))
+        #model.add(InputLayer(input_shape=(153, 1, 300)))
+        #print(model.output_shape)
+        model.add(Reshape((1, list_of_embeddings[1].size), input_shape = Emb_train.shape[1:])) ##magical fucking stupid keras BS
+        #print(model.output_shape)
+        #model.add(Conv1D(filters=12, kernel_size=1, activation='relu')) ##works now
+        model.add(GRU(list_of_embeddings[1].size))
+        #print(model.output_shape)
+        #model.add(Flatten())
+        #model.add(Dense(list_of_embeddings[1].size, activation='relu',kernel_initializer='he_uniform', use_bias = False))
         #model.add(LSTM(list_of_embeddings[1].size, return_sequences = True,))
         model.add(Dense(len(np.unique(Y_val)),activation='softmax',kernel_initializer=kernel_initializer, use_bias = False))
         model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
