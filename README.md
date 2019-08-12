@@ -18,6 +18,7 @@ TODO:
 * Finish README - Cite relavent technologies and papers 
 * Documentation/Examples/Installation Instructions 
 * More examples
+* Enable Cross Validation and Grid Search
 * Figure out better way to store embeddings (stop moving the embeddings from GPU to CPU ineffeciently)
 
 Changelog: 
@@ -25,6 +26,7 @@ Changelog:
 8/12/2019 - 
 * got Keras RNN/CNN working!
 * Now Prints out misclassified examples in validation test set and we see probabilities. 
+* Easy to switch between MLP/CNN/RNN
 
 8/9/2019 - 
 * Added model, model weights, updated dataset, and misc code updates 
