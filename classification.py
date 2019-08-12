@@ -2,7 +2,7 @@ import string
 import csv
 from flair.data import Sentence
 from flair.models import SequenceTagger
-from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings, DocumentPoolEmbeddings, BertEmbeddings, ELMoEmbeddings, OpenAIGPTEmbeddings, RoBERTaEmbeddings, XLNetEmbeddings
+from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings, DocumentPoolEmbeddings, BertEmbeddings, ELMoEmbeddings, OpenAIGPTEmbeddings, RoBERTaEmbeddings, XLNetEmbeddings, BytePairEmbeddings
 import torch
 from torch import tensor
 import numpy as np
@@ -43,6 +43,11 @@ def parse_string(a_str):
     to_ret3 = " ".join(to_ret2)
     return to_ret3
 
+
+def get_misclass():
+    print("misclassified examples!!!")
+    return np.where(Y_val != pipe.predict(X_val))
+
 class Text2Vec( BaseEstimator, TransformerMixin):
     '''
     def __init__():
@@ -82,9 +87,11 @@ class Text2Vec( BaseEstimator, TransformerMixin):
 
 
 
-stacked_embeddings = DocumentPoolEmbeddings([#WordEmbeddings('en'),
+stacked_embeddings = DocumentPoolEmbeddings([WordEmbeddings('en'),
                                         #WordEmbeddings('glove'),
-                                        WordEmbeddings('en-crawl')])
+                                        #WordEmbeddings('en-crawl',
+                                       #BytePairEmbeddings('en', 300),
+                                       ])
 
 with open('card_classification.csv') as csvfile:
     reader = csv.reader(csvfile)
@@ -109,10 +116,10 @@ def create_model(optimizer='adam', kernel_initializer='glorot_uniform', epochs =
         model = Sequential()
         #model.add(InputLayer(input_shape=(153, 1, 300)))
         #print(model.output_shape)
-        model.add(Reshape((1, list_of_embeddings[1].size), input_shape = Emb_train.shape[1:])) ##magical fucking stupid keras BS
+        model.add(Reshape((1, list_of_embeddings[1].size), input_shape = Emb_train.shape[1:])) ##magical fucking stupid keras BS needed for RNN/CNN
         #print(model.output_shape)
-        #model.add(Conv1D(filters=12, kernel_size=1, activation='relu')) ##works now
-        model.add(GRU(list_of_embeddings[1].size))
+        #model.add(Conv1D(filters=20, kernel_size=1, activation='relu')) ##works now
+        model.add(GRU(list_of_embeddings[1].size)) ##this works too - seems to be better for smaller datasets too!
         #print(model.output_shape)
         #model.add(Flatten())
         #model.add(Dense(list_of_embeddings[1].size, activation='relu',kernel_initializer='he_uniform', use_bias = False))
@@ -125,7 +132,7 @@ def create_model(optimizer='adam', kernel_initializer='glorot_uniform', epochs =
 
 if keras:
     checkpointer = ModelCheckpoint(filepath='/tmp/weights.hdf5', verbose=1, save_best_only=True)    
-    model = KerasClassifier(build_fn=create_model, batch_size = 32, epochs = 150, callbacks=[checkpointer], validation_split = 0.2)
+    model = KerasClassifier(build_fn=create_model, batch_size = 32, epochs = 50, callbacks=[checkpointer], validation_split = 0.2)
 
 
 
@@ -152,10 +159,14 @@ conf = confusion_matrix(Y_val, pred, labels=labels)
 
 print(pd.DataFrame(conf, index=labels, columns=labels))
 
+
+predicts = pipe.predict(X_val)
 probs = pipe.predict_proba(X_val)
 a_df = pd.DataFrame(probs, index=Y_val, columns=labels)
 a_df[a_df.eq(0)] = np.nan
 print(a_df.round(2))
+
+print(a_df.iloc[get_misclass()])
 
 if keras:
     pipe.named_steps['model'].model.save('keras_model.h5')
