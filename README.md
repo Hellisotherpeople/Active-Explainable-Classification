@@ -24,6 +24,7 @@ Changelog:
 
 8/12/2019 - 
 * got Keras RNN/CNN working!
+* Now Prints out misclassified examples in validation test set and we see probabilities. 
 
 8/9/2019 - 
 * Added model, model weights, updated dataset, and misc code updates 
