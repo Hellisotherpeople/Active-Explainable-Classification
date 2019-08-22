@@ -52,7 +52,7 @@ ANB = Antiblackness, CAP = Capitalism, ECON = Economy, EDU = Education, ENV = En
 
 Top matrix is a confusion matrix of my validation set 
 
-This classifier gets 75% accuracy
+This classifier gets 75% accuracy (~150 examples in train set, 0.2 * 150 in val set) 
 
 Bottom matrix is showing classification probabilities for each individual example in my validation set.
 
