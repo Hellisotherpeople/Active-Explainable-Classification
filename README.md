@@ -15,6 +15,7 @@ I want to take in massive sums of articles from a news API which will be placed 
 
 
 TODO:
+* Integrate Uncertainty measurments and only have it prompt to label those examples (self label what it's certain about) 
 * Finish README - Cite relavent technologies and papers 
 * Documentation/Examples/Installation Instructions 
 * More examples
