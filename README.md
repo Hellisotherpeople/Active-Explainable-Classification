@@ -1,6 +1,8 @@
 # Active-Explainable-Classification
 A set of tools for leveraging active learning and model explainability for effecient document classification
 
+Note: A webapp which implements much of the functionality of this repo (minus the active labeling part, at this time anyway!) can be found here: https://huggingface.co/spaces/Hellisotherpeople/Interpretable_Text_Classification_And_Clustering
+
 ## What is this?
 
 One component of my vision of FULLY AUTOMATED competative debate case production. 
